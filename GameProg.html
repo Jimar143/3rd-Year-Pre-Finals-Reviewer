@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT2012 | Professional Quiz Reviewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --accent-primary: #6366f1;
+            --accent-secondary: #4f46e5;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --correct: #10b981;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent),
+                              radial-gradient(circle at bottom left, rgba(79, 70, 229, 0.05), transparent);
+        }
+
+        .professional-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Improved Professional Buttons */
+        .btn-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-option:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .option-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .btn-option:hover .option-indicator {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Result States */
+        .btn-option.correct {
+            background: rgba(16, 185, 129, 0.1) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+        }
+        .btn-option.correct .option-indicator {
+            background: var(--correct);
+            border-color: var(--correct);
+            color: white;
+        }
+
+        .btn-option.wrong {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: var(--wrong) !important;
+            color: var(--wrong) !important;
+        }
+        .btn-option.wrong .option-indicator {
+            background: var(--wrong);
+            border-color: var(--wrong);
+            color: white;
+        }
+
+        .progress-container {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .back-index-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+
+        .back-index-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-4xl mx-auto w-full">
+        <!-- Top Navigation -->
+        <div class="mb-8 flex justify-between items-center">
+            <a href="index.html" class="back-index-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Return to Index
+            </a>
+            <div class="text-right">
+                <span class="block text-xs uppercase tracking-widest text-slate-500 font-bold mb-1">Module Quiz</span>
+                <span class="text-indigo-400 font-semibold">IT2012: Game Development</span>
+            </div>
+        </div>
+
+        <div id="quiz-ui" class="space-y-8">
+            <!-- Header Info -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Reviewer Assessment</h1>
+                    <p class="text-slate-400 mt-1">Foundations of Gameplay & Level Design</p>
+                </div>
+                <div class="flex items-center gap-6 bg-slate-800/40 px-6 py-3 rounded-2xl border border-white/5">
+                    <div class="text-center border-r border-white/10 pr-6">
+                        <span class="block text-[10px] uppercase text-slate-500 font-bold mb-1">Progress</span>
+                        <span id="question-index" class="text-lg font-bold">1 / 35</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-[10px] uppercase text-slate-500 font-bold mb-1">Current Score</span>
+                        <span id="live-score" class="text-lg font-bold text-indigo-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div id="quiz-card" class="professional-card p-8 md:p-12 min-h-[450px] flex flex-col">
+                <div id="question-wrapper" class="fade-in flex-grow">
+                    <span id="topic-tag" class="inline-block px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase tracking-wider mb-6 border border-indigo-500/20">Handout 5: Gameplay</span>
+                    <h2 id="question-text" class="text-xl md:text-2xl font-medium leading-relaxed mb-8">Loading assessment...</h2>
+                    
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+
+                <div class="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div id="feedback-area" class="text-sm font-medium h-6"></div>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button id="prev-btn" class="nav-btn bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-30 disabled:pointer-events-none flex-1 md:flex-none">
+                            Previous
+                        </button>
+                        <button id="next-btn" class="nav-btn bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-30 disabled:pointer-events-none shadow-lg shadow-indigo-600/20 flex-1 md:flex-none">
+                            Next Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden professional-card p-12 text-center fade-in">
+            <div class="max-w-md mx-auto">
+                <div class="w-24 h-24 bg-indigo-500/20 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold mb-2">Assessment Completed</h2>
+                <p class="text-slate-400 mb-8">You have successfully finished the reviewer for Handouts 05 and 06.</p>
+                
+                <div class="bg-slate-800/50 rounded-2xl p-8 mb-10 border border-white/5">
+                    <span class="block text-xs uppercase font-bold text-slate-500 tracking-widest mb-2">Final Performance</span>
+                    <div id="final-score" class="text-5xl font-black text-indigo-400 mb-2">0 / 35</div>
+                    <div id="result-text" class="text-sm font-medium text-slate-300">Calculating grade...</div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button onclick="location.reload()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all">
+                        Restart Review
+                    </button>
+                    <a href="index.html" class="w-full py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition-all">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Handout 05: Gameplay
+            { q: "What is defined as the choices, challenges, or consequences that players face in a virtual environment?", o: ["Rules", "Gameplay", "Victory Conditions", "Level Design"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "Which type of loss condition occurs when a character dies or runs out of vital resources?", o: ["Implicit", "Static", "Explicit", "Dynamic"], a: 2, t: "Handout 5: Gameplay" },
+            { q: "In which interactivity mode does a player interact only with the game itself and the platform?", o: ["Multiplayer", "Player-to-Developer", "Player-to-Game", "Social Mode"], a: 2, t: "Handout 5: Gameplay" },
+            { q: "Game theory applies to games that contain how many opponents?", o: ["Exactly one", "Two or more", "Only human players", "Artificial Intelligence only"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "Which game theory situation involves players with completely opposing interests where only one can win?", o: ["Zero-Sum", "Non-Zero Sum", "Prisoner's Dilemma", "Symmetric"], a: 0, t: "Handout 5: Gameplay" },
+            { q: "A Battle Royale game where everyone must eliminate each other is an example of:", o: ["Zero-Sum", "Cooperative Play", "Prisoner's Dilemma", "Static Play"], a: 2, t: "Handout 5: Gameplay" },
+            { q: "What type of challenge is not specifically added but is an 'emergent feature' of the game itself?", o: ["Explicit", "Implicit", "Mental", "Linear"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "When the complete state of play is known to the players at all times, it is called:", o: ["Imperfect Information", "Perfect Information", "Intrinsic Knowledge", "Spatial awareness"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "Knowledge gained from within the game world (e.g., from an NPC) is called:", o: ["Extrinsic", "Intrinsic", "Meta", "Explicit"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "Which challenge refers to the speed at which a player responds to an in-game event?", o: ["Reaction Time", "Spatial Awareness", "Resource Management", "Analysis"], a: 0, t: "Handout 5: Gameplay" },
+            { q: "The goal of 'reaching a higher level' or making a character more powerful is:", o: ["Race", "Advancement", "Exploration", "Conflict"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "In puzzle games like Tetris, the goal of arranging items in a particular order is:", o: ["Construction", "Organization", "Solution", "Capture"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "What goal involves getting the competition to 'break the rules' using physical/emotional stamina?", o: ["Taboo", "Outwit", "Escape", "Chase"], a: 0, t: "Handout 5: Gameplay" },
+            { q: "A game is considered 'Balanced' if players perceive it as:", o: ["Flashy and loud", "Consistent, fair, and fun", "Extremely difficult", "Short and simple"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "The principle that players should only make important decisions, even in micromanagement, is:", o: ["Lack of stagnation", "Consistent challenges", "Lack of trivial decisions", "Difficulty options"], a: 2, t: "Handout 5: Gameplay" },
+            
+            // Handout 06: Levels
+            { q: "What is defined as the creation of environments, scenarios, or missions in an electronic game?", o: ["Game Design", "Level Design", "Storyboarding", "Character Design"], a: 1, t: "Handout 6: Levels" },
+            { q: "Which concept ensures players stay in an area until objectives are met and prevents back-tracking?", o: ["Duration", "Flow", "Availability", "Scale"], a: 1, t: "Handout 6: Levels" },
+            { q: "How many levels should a player generally be able to complete in a single session?", o: ["Zero", "At least one", "At least five", "The entire game"], a: 1, t: "Handout 6: Levels" },
+            { q: "Hardcore gamers generally have a concentration span for a session of approximately:", o: ["15 minutes", "45 minutes", "2 hours", "8 hours"], a: 2, t: "Handout 6: Levels" },
+            { q: "What relationship describes levels that are self-contained with their own internal plotline?", o: ["Linear", "Episodic", "Parallel", "Static"], a: 1, t: "Handout 6: Levels" },
+            { q: "Boktai (GBA) used a sensor for what kind of time implementation?", o: ["Limited Time", "Authentic Time", "Altered Time", "Player-Adjusted"], a: 1, t: "Handout 6: Levels" },
+            { q: "Max Payne introduced 'Bullet Time', which is an example of:", o: ["Warp time", "Altered time", "Real time", "System time"], a: 1, t: "Handout 6: Levels" },
+            { q: "Which perspective allows viewing different parts of the world, often looking down from above?", o: ["Omnipresent", "First-Person", "Third-Person", "Side-Scrolling"], a: 0, t: "Handout 6: Levels" },
+            { q: "What is the typical angle for an Isometric perspective?", o: ["0 to 15 degrees", "30 to 45 degrees", "90 degrees", "Linear"], a: 1, t: "Handout 6: Levels" },
+            { q: "Which technique uses background layers moving at different speeds to create depth?", o: ["Radiosity", "Shading", "Parallax Scrolling", "Flat View"], a: 2, t: "Handout 6: Levels" },
+            { q: "What term refers specifically to textures appearing on ground surfaces (dirt, grass, tile)?", o: ["Materials", "Terrain", "Radiosity", "Style"], a: 1, t: "Handout 6: Levels" },
+            { q: "What defines how materials behave when lit, combining texture, color, and shininess?", o: ["Scale", "Shading Model", "Perspective", "Atmosphere"], a: 1, t: "Handout 6: Levels" },
+            { q: "The effect used to provide visibility and reflections on glass or water is:", o: ["Radiosity", "Saturation", "Contrast", "Density"], a: 0, t: "Handout 6: Levels" },
+            { q: "Which genre requires that space and objects be scaled to relative size for realism?", o: ["Puzzle", "Action", "Simulation", "RPG"], a: 2, t: "Handout 6: Levels" },
+            { q: "The look and feel of the game world, including artwork consistency, is called:", o: ["Scale", "Style", "Structure", "Space"], a: 1, t: "Handout 6: Levels" },
+            
+            // Mixed/Advanced from handouts
+            { q: "Implicit loss conditions are most common in what type of games?", o: ["Management sims", "Racing games", "Puzzle games", "RTS games"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "A briefing in the form of a cut-scene at the start of a level helps clarify:", o: ["Flow", "Objectives", "Scale", "Style"], a: 1, t: "Handout 6: Levels" },
+            { q: "Water-type Pokémon being strong against Fire-type is an example of what knowledge?", o: ["Intrinsic", "Extrinsic", "Implicit", "Mental"], a: 1, t: "Handout 5: Gameplay" },
+            { q: "Management of resources with a very high level of detail is known as:", o: ["Analysis", "Conflict", "Micromanagement", "Exploration"], a: 2, t: "Handout 5: Gameplay" },
+            { q: "Which design concept answers: 'What are the relationships between levels in the game?'", o: ["Duration", "Flow", "Relationship", "Availability"], a: 2, t: "Handout 6: Levels" }
+        ];
+
+        let currentIndex = 0;
+        let answers = new Array(quizData.length).fill(null);
+
+        const elements = {
+            qText: document.getElementById('question-text'),
+            options: document.getElementById('options-grid'),
+            idx: document.getElementById('question-index'),
+            score: document.getElementById('live-score'),
+            progress: document.getElementById('progress-bar'),
+            next: document.getElementById('next-btn'),
+            prev: document.getElementById('prev-btn'),
+            feedback: document.getElementById('feedback-area'),
+            quizUI: document.getElementById('quiz-ui'),
+            results: document.getElementById('results-screen'),
+            wrapper: document.getElementById('question-wrapper'),
+            topic: document.getElementById('topic-tag')
+        };
+
+        function calculateScore() {
+            return answers.reduce((acc, val, i) => (val === quizData[i].a ? acc + 1 : acc), 0);
+        }
+
+        function render() {
+            const data = quizData[currentIndex];
+            const previous = answers[currentIndex];
+            
+            elements.qText.innerText = data.q;
+            elements.topic.innerText = data.t;
+            elements.idx.innerText = `${currentIndex + 1} / ${quizData.length}`;
+            elements.progress.style.width = `${((currentIndex) / quizData.length) * 100}%`;
+            elements.prev.disabled = currentIndex === 0;
+            elements.next.innerText = currentIndex === quizData.length - 1 ? "Finish Assessment" : "Next Question";
+            elements.next.disabled = previous === null;
+            elements.score.innerText = calculateScore();
+            
+            elements.feedback.innerHTML = '';
+            elements.options.innerHTML = '';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            data.o.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerHTML = `<span class="option-indicator">${letters[i]}</span> <span>${opt}</span>`;
+                
+                if (previous !== null) {
+                    btn.disabled = true;
+                    if (i === data.a) btn.classList.add('correct');
+                    else if (i === previous) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => select(i);
+                }
+                elements.options.appendChild(btn);
+            });
+
+            elements.wrapper.classList.remove('fade-in');
+            void elements.wrapper.offsetWidth; 
+            elements.wrapper.classList.add('fade-in');
+        }
+
+        function select(i) {
+            if (answers[currentIndex] !== null) return;
+            answers[currentIndex] = i;
+            render();
+            
+            const isCorrect = i === quizData[currentIndex].a;
+            elements.feedback.innerHTML = isCorrect ? 
+                '<span class="text-emerald-400 flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Correct response identified</span>' : 
+                '<span class="text-rose-400 flex items-center gap-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg> Incorrect choice selected</span>';
+        }
+
+        elements.next.onclick = () => {
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                finish();
+            }
+        };
+
+        elements.prev.onclick = () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                render();
+            }
+        };
+
+        function finish() {
+            elements.quizUI.classList.add('hidden');
+            elements.results.classList.remove('hidden');
+            elements.progress.style.width = '100%';
+            
+            const score = calculateScore();
+            document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+            
+            const resultText = document.getElementById('result-text');
+            const percent = (score / quizData.length) * 100;
+            
+            if (percent === 100) resultText.innerText = "Exceptional achievement. Perfect Mastery.";
+            else if (percent >= 85) resultText.innerText = "Excellent comprehension of materials.";
+            else if (percent >= 70) resultText.innerText = "Satisfactory performance. Ready for exams.";
+            else resultText.innerText = "Review recommended to strengthen foundational knowledge.";
+        }
+
+        render();
+    </script>
+</body>
+</html>
