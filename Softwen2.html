@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT2038 | Comprehensive Exam Reviewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --accent-primary: #6366f1;
+            --accent-secondary: #4f46e5;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --correct: #10b981;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .professional-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+        }
+
+        .btn-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent-primary);
+        }
+
+        .option-indicator {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-option.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+        }
+        .btn-option.correct .option-indicator {
+            background: var(--correct);
+            border-color: var(--correct);
+            color: white;
+        }
+
+        .btn-option.wrong {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--wrong) !important;
+            color: var(--wrong) !important;
+        }
+        .btn-option.wrong .option-indicator {
+            background: var(--wrong);
+            border-color: var(--wrong);
+            color: white;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.3s ease;
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black text-indigo-400">IT2038 | EXAM PREP</h1>
+                <p class="text-slate-500 text-sm">Testing & Deployment (Full Review)</p>
+            </div>
+            <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all">
+                Shuffle & Restart
+            </button>
+        </div>
+
+        <div id="quiz-ui">
+            <!-- Progress Section -->
+            <div class="mb-6 flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-widest">
+                <span>Question <span id="current-count">0</span> / <span id="total-count">0</span></span>
+                <span>Score: <span id="score-display" class="text-indigo-400">0</span></span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mb-8 overflow-hidden">
+                <div id="progress-line" class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <!-- Card -->
+            <div class="professional-card p-6 md:p-10">
+                <div id="question-container" class="fade-in">
+                    <div id="topic-tag" class="text-[10px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full inline-block mb-6 uppercase tracking-widest">TOPIC</div>
+                    <h2 id="question-text" class="text-xl md:text-2xl font-bold mb-8 leading-relaxed">Loading questions...</h2>
+                    <div id="options-grid" class="grid grid-cols-1 gap-4">
+                        <!-- Options go here -->
+                    </div>
+                </div>
+
+                <!-- Footer Nav -->
+                <div class="mt-10 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div id="feedback-text" class="text-sm font-bold min-h-[20px]"></div>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button id="btn-prev" class="px-6 py-3 rounded-xl bg-slate-800 text-slate-400 font-bold text-sm disabled:opacity-30">Previous</button>
+                        <button id="btn-next" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm disabled:opacity-30 flex-grow md:flex-grow-0">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-ui" class="hidden professional-card p-12 text-center fade-in">
+            <h2 class="text-3xl font-black mb-2">Review Complete!</h2>
+            <p class="text-slate-400 mb-8">Here is your performance summary for IT2038 Handout 05.</p>
+            <div class="bg-slate-800/50 p-8 rounded-3xl border border-white/5 inline-block mb-8">
+                <div id="final-score" class="text-6xl font-black text-indigo-400 mb-2">0/0</div>
+                <div id="performance-comment" class="text-sm font-bold text-slate-500 uppercase tracking-widest">Excellent!</div>
+            </div>
+            <div class="flex flex-col gap-4 max-w-xs mx-auto">
+                <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-black">RETAKE REVIEW</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // All possible questions derived from the 4-page handout
+        const rawData = [
+            // Page 1: Fundamentals
+            { q: "What is the process of examining a component, subsystem, or system to determine its operational characteristics and whether it contains defects?", o: ["Implementation", "Testing", "Deployment", "Maintenance"], a: 1, t: "Testing Basics" },
+            { q: "To conduct a test, developers must have well-defined ________ for both functional and non-functional requirements.", o: ["Programming tools", "Specifications", "Budget plans", "Marketing strategies"], a: 1, t: "Testing Basics" },
+            { q: "If results indicate a shortcoming or defect, the project team cycles back through which activities?", o: ["Planning", "Implementation or deployment", "Marketing", "Requirement gathering"], a: 1, t: "Testing Basics" },
+            { q: "A formal description of a starting state, events, and the expected response is called a:", o: ["Test data", "Test case", "User manual", "Project charter"], a: 1, t: "Test Case" },
+            { q: "Starting states and events are represented by a set of:", o: ["Test data", "Logic diagrams", "User roles", "System logs"], a: 0, t: "Test Case" },
+            
+            // Table 1 - Core Processes
+            { q: "According to Figure 1, what is the Core Process of 'Unit Testing'?", o: ["Implementation", "Deployment", "Maintenance", "Testing"], a: 0, t: "Test Types" },
+            { q: "What is the Core Process of 'Integration Testing'?", o: ["Implementation", "Deployment", "Maintenance", "Planning"], a: 0, t: "Test Types" },
+            { q: "The 'System and Stress Testing' type belongs to which Core Process?", o: ["Implementation", "Deployment", "Documentation", "Maintenance"], a: 1, t: "Test Types" },
+            { q: "The 'User Acceptance Testing' belongs to which Core Process?", o: ["Implementation", "Deployment", "Design", "Analysis"], a: 1, t: "Test Types" },
+
+            // Specific Examples from Table 1
+            { q: "A component that incorrectly calculates sales tax amounts in different locations is a failure of which test?", o: ["Unit Testing", "Integration Testing", "System Testing", "User Acceptance Testing"], a: 0, t: "Testing Examples" },
+            { q: "A sales tax component that calculates incorrectly when receiving foreign currencies is an example of a defect in:", o: ["Unit Testing", "Integration Testing", "Stress Testing", "System Documentation"], a: 1, t: "Testing Examples" },
+            { q: "An item lookup function retrieves data in 2 seconds in isolation but 30 seconds with a live database. This is a failure of:", o: ["Unit testing", "Integration testing", "System and stress testing", "User acceptance testing"], a: 2, t: "Testing Examples" },
+            { q: "A commission system that fails to handle special promotions is an unacceptable failure in which test type?", o: ["Unit testing", "Integration testing", "User acceptance testing", "System testing"], a: 2, t: "Testing Examples" },
+
+            // Page 1 & 2: Test Types Detailed
+            { q: "What is the lowest level and earliest testing for a new software system?", o: ["Integration testing", "Unit testing", "System testing", "UAT"], a: 1, t: "Unit Testing" },
+            { q: "The primary purpose of unit testing is to test a small piece of code in ________.", o: ["Production", "Isolation", "Groups", "Live database"], a: 1, t: "Unit Testing" },
+            { q: "What is the next logical extension of unit testing?", o: ["System testing", "Integration testing", "Stress testing", "Deployment"], a: 1, t: "Integration Testing" },
+            { q: "The purpose of this test is to identify errors that couldn't be detected by unit testing.", o: ["System testing", "Integration testing", "Unit testing", "Direct deployment"], a: 1, t: "Integration Testing" },
+            { q: "What does 'System Testing' mean?", o: ["Testing individual methods", "Testing the system as a whole", "Testing user interface colors", "Testing server hardware"], a: 1, t: "System Testing" },
+            { q: "Which test examines how the system behaves under intense loads and how it recovers?", o: ["Unit test", "Stress test", "Integration test", "Logic test"], a: 1, t: "Stress Testing" },
+            { q: "A performance test is also called a ________ test.", o: ["Stress", "Unit", "User", "Data"], a: 0, t: "Stress Testing" },
+            { q: "Who performs the User Acceptance Testing (UAT)?", o: ["Lead developers", "Actual software users", "Hardware technicians", "Project managers"], a: 1, t: "UAT" },
+            { q: "UAT is a critical software project procedure that must occur before software is rolled out to the ________.", o: ["Developers", "Internal team", "Market", "Beta testers"], a: 2, t: "UAT" },
+
+            // Figure 3 System Testing Types
+            { q: "According to Figure 3, which of the following is NOT included in System Performance/Stress Testing?", o: ["Speed", "Throughput", "Stability", "Code syntax"], a: 3, t: "System Testing" },
+            { q: "Is 'Resource Usage' included in the types of tests for system testing in Figure 3?", o: ["Yes", "No", "Only for unit tests", "Only for maintenance"], a: 0, t: "System Testing" },
+
+            // Deployment Activities & User Training
+            { q: "Once a system is developed and tested, it must be placed into operation. This refers to:", o: ["Maintenance", "Deployment activities", "Requirement gathering", "Analysis"], a: 1, t: "Deployment" },
+            { q: "What is an essential part of any system deployment project?", o: ["Coding", "Training Users", "Database design", "Graphic design"], a: 1, t: "User Training" },
+            { q: "People who use the system day-to-day to achieve business purposes are called:", o: ["System operators", "End users", "Maintenance personnel", "Stakeholders"], a: 1, t: "User Roles" },
+            { q: "People who perform administrative functions and routine maintenance are called:", o: ["End users", "System operators", "Database designers", "Programmers"], a: 1, t: "User Roles" },
+            { q: "Which of the following is an activity of an End-user?", o: ["Starting the system", "Generating reports", "Recovering data from archive", "Installing software"], a: 1, t: "User Activities" },
+            { q: "Which of the following is an activity of a System Operator?", o: ["Creating records", "Installing or upgrading software", "Modifying database contents", "Querying the database"], a: 1, t: "User Activities" },
+            { q: "Backing up data to archive is a typical activity of which role?", o: ["End user", "System operator", "Data entry clerk", "Secretary"], a: 1, t: "User Activities" },
+            { q: "Creating records or transactions is a typical activity of which role?", o: ["End user", "System operator", "System architect", "IT manager"], a: 0, t: "User Activities" },
+
+            // Documentation
+            { q: "System documentation is primarily intended for which audience?", o: ["End users", "Developers and technical personnel", "Marketing team", "External customers"], a: 1, t: "Documentation" },
+            { q: "When are documentation and training materials usually developed?", o: ["After deployment", "Before formal user training begins", "During unit testing", "At the very start of the project"], a: 1, t: "Documentation" },
+            { q: "Which documentation type describes system requirements, architecture, and construction details?", o: ["User documentation", "System documentation", "Operator manual", "Help guide"], a: 1, t: "Documentation" },
+            { q: "Which documentation type is used by end-users and system operators to learn how to use the system?", o: ["System documentation", "User documentation", "Technical blueprints", "Data schemas"], a: 1, t: "Documentation" },
+
+            // Deployment Approaches
+            { q: "Which deployment method installs a new system, makes it operational, and immediately turns off the old system?", o: ["Parallel deployment", "Direct deployment", "Phased deployment", "Unit deployment"], a: 1, t: "Deployment Methods" },
+            { q: "In parallel deployment, how long do the old and new systems operate together?", o: ["For 1 hour", "For an extended period", "They never operate together", "Until the developers leave"], a: 1, t: "Deployment Methods" },
+            { q: "Which deployment method makes a system operational in a series of steps or phases?", o: ["Direct deployment", "Parallel deployment", "Phased deployment", "Quick deployment"], a: 2, t: "Deployment Methods" },
+            { q: "Different deployment approaches represent trade-offs among cost, complexity, and ________.", o: ["Risk", "Speed", "Color", "Storage"], a: 0, t: "Deployment Methods" },
+            { q: "Can phased deployment be combined with parallel deployment?", o: ["Yes", "No", "Only in unit testing", "Only in direct deployment"], a: 0, t: "Deployment Methods" },
+            
+            // Figure 5, 6, 7 Logic
+            { q: "In Figure 5 (Direct Deployment), what happens to the Old System when the New System is operational?", o: ["It continues to run", "It is immediately terminated", "It is archived for 10 years", "It is upgraded"], a: 1, t: "Figures" },
+            { q: "In Figure 6, what is the purpose of running systems in parallel?", o: ["To double the cost", "To test until the new system is determined error-free", "To confuse the users", "To use more power"], a: 1, t: "Figures" },
+            { q: "During each phase of a Phased Deployment, what is done to ensure readiness for the next phase?", o: ["The system is tested", "The system is deleted", "The code is rewritten", "The database is cleared"], a: 0, t: "Figures" }
+        ];
+
+        // Shuffle logic (Fisher-Yates)
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Initialize quiz data with shuffled options and shuffled questions
+        const quizData = rawData.map(item => {
+            const correctText = item.o[item.a];
+            const shuffledOptions = shuffle([...item.o]);
+            return {
+                ...item,
+                o: shuffledOptions,
+                a: shuffledOptions.indexOf(correctText)
+            };
+        });
+        shuffle(quizData);
+
+        let currentIndex = 0;
+        let answers = new Array(quizData.length).fill(null);
+
+        const dom = {
+            qText: document.getElementById('question-text'),
+            options: document.getElementById('options-grid'),
+            currentIdx: document.getElementById('current-count'),
+            totalIdx: document.getElementById('total-count'),
+            score: document.getElementById('score-display'),
+            progLine: document.getElementById('progress-line'),
+            feedback: document.getElementById('feedback-text'),
+            topic: document.getElementById('topic-tag'),
+            btnPrev: document.getElementById('btn-prev'),
+            btnNext: document.getElementById('btn-next'),
+            quizUI: document.getElementById('quiz-ui'),
+            resultUI: document.getElementById('result-ui'),
+            finalScore: document.getElementById('final-score'),
+            perfComment: document.getElementById('performance-comment')
+        };
+
+        function getScore() {
+            return answers.reduce((acc, val, i) => (val === quizData[i].a ? acc + 1 : acc), 0);
+        }
+
+        function render() {
+            const data = quizData[currentIndex];
+            const chosen = answers[currentIndex];
+
+            dom.qText.innerText = data.q;
+            dom.topic.innerText = data.t;
+            dom.currentIdx.innerText = currentIndex + 1;
+            dom.totalIdx.innerText = quizData.length;
+            dom.score.innerText = getScore();
+            dom.progLine.style.width = `${((currentIndex) / quizData.length) * 100}%`;
+            
+            dom.btnPrev.disabled = currentIndex === 0;
+            dom.btnNext.innerText = currentIndex === quizData.length - 1 ? "FINISH" : "NEXT";
+            dom.btnNext.disabled = chosen === null;
+
+            dom.options.innerHTML = '';
+            dom.feedback.innerHTML = '';
+
+            const labels = ['A', 'B', 'C', 'D'];
+            data.o.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerHTML = `<span class="option-indicator">${labels[i]}</span> <span>${opt}</span>`;
+                
+                if (chosen !== null) {
+                    btn.disabled = true;
+                    if (i === data.a) btn.classList.add('correct');
+                    else if (i === chosen) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => {
+                        answers[currentIndex] = i;
+                        render();
+                    };
+                }
+                dom.options.appendChild(btn);
+            });
+
+            if (chosen !== null) {
+                const isCorrect = chosen === data.a;
+                dom.feedback.innerHTML = isCorrect ? 
+                    '<span class="text-emerald-400">CORRECT! Well done.</span>' : 
+                    `<span class="text-rose-400">INCORRECT. The correct answer is: ${data.o[data.a]}</span>`;
+            }
+        }
+
+        dom.btnNext.onclick = () => {
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                showResults();
+            }
+        };
+
+        dom.btnPrev.onclick = () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                render();
+            }
+        };
+
+        function showResults() {
+            dom.quizUI.classList.add('hidden');
+            dom.resultUI.classList.remove('hidden');
+            const score = getScore();
+            dom.finalScore.innerText = `${score} / ${quizData.length}`;
+            
+            const perc = (score / quizData.length) * 100;
+            if (perc === 100) dom.perfComment.innerText = "PERFECT! You are ready for the exam.";
+            else if (perc >= 85) dom.perfComment.innerText = "EXCELLENT! You have mastered the handout.";
+            else if (perc >= 70) dom.perfComment.innerText = "PASSED! Good job, but check your mistakes.";
+            else dom.perfComment.innerText = "NEEDS REVIEW. Please read the handout again.";
+        }
+
+        render();
+    </script>
+</body>
+</html>
