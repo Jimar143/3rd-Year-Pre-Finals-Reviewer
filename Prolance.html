@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT2409 | Python Mastery Reviewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --surface-color: #0f172a;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #6366f1;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.08) 0, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.08) 0, transparent 50%);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-option {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .option-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .btn-option.correct {
+            background: rgba(34, 197, 94, 0.1) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+        }
+        .btn-option.correct .option-num { background: var(--correct); color: white; }
+
+        .btn-option.wrong {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: var(--wrong) !important;
+            color: var(--wrong) !important;
+        }
+        .btn-option.wrong .option-num { background: var(--wrong); color: white; }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
+
+        code {
+            background: #000;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 1.25rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto w-full">
+        <!-- Header -->
+        <div class="mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></span>
+                    <span class="text-xs font-black uppercase tracking-[0.3em] text-sky-500">Active Review Session</span>
+                </div>
+                <h1 class="text-4xl font-black text-white tracking-tight">Python Fundamentals</h1>
+            </div>
+            <div class="flex gap-4">
+                <div class="stat-box">
+                    <span class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Item</span>
+                    <span id="current-count" class="text-2xl font-black text-white">0 / 0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Accuracy</span>
+                    <span id="score-display" class="text-2xl font-black text-emerald-400">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-ui">
+            <!-- Progress -->
+            <div class="w-full bg-slate-900 rounded-full h-2 mb-12 overflow-hidden border border-white/5">
+                <div id="progress-line" class="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="glass-card p-8 md:p-14 min-h-[500px] flex flex-col relative overflow-hidden">
+                <div id="question-wrapper" class="fade-in flex-grow relative z-10">
+                    <div id="topic-tag" class="inline-flex items-center px-4 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8">Category</div>
+                    <h2 id="question-text" class="text-2xl md:text-3xl font-bold leading-relaxed text-white mb-12">Initializing knowledge database...</h2>
+                    
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Options generated via JS -->
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="mt-16 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8 z-10">
+                    <div id="feedback-area" class="text-sm font-bold min-h-[24px]"></div>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button id="btn-prev" class="px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition-all disabled:opacity-20">Back</button>
+                        <button id="btn-next" class="px-10 py-4 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-black shadow-lg shadow-sky-600/20 transition-all disabled:opacity-20 flex-grow md:flex-grow-0">Next Question</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Dashboard -->
+        <div id="result-ui" class="hidden glass-card p-16 text-center fade-in">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-32 h-32 bg-sky-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-sky-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-5xl font-black text-white mb-4">Assessment Complete</h2>
+                <p class="text-slate-400 text-lg mb-12">You've successfully processed all fundamental Python concepts.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    <div class="bg-slate-800/40 p-8 rounded-3xl border border-white/5">
+                        <span class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Points</span>
+                        <div id="final-score" class="text-5xl font-black text-sky-400">0/0</div>
+                    </div>
+                    <div class="bg-slate-800/40 p-8 rounded-3xl border border-white/5">
+                        <span class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Rating</span>
+                        <div id="performance-comment" class="text-2xl font-black text-white">Excellent</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="w-full md:w-auto px-12 py-5 bg-sky-600 hover:bg-sky-500 text-white rounded-2xl font-black text-xl shadow-2xl shadow-sky-600/30 transition-all">
+                    RESTART ASSESSMENT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // COMPREHENSIVE DATA (65 ITEMS)
+        const quizBank = [
+            // INTEGERS
+            { q: "What is an integer literal composed of digits used for readability in Python (replacing commas)?", o: ["Underscore (_)", "Period (.)", "Comma (,)", "Hyphen (-)"], a: 0, t: "Integers" },
+            { q: "Which character prefix is used to denote an octal value in Python?", o: ["0x", "0o", "0b", "0t"], a: 1, t: "Integers" },
+            { q: "What is the decimal equivalent of the octal number 0o123?", o: ["83", "123", "64", "91"], a: 0, t: "Integers" },
+            { q: "Which prefix identifies a hexadecimal number in Python programming?", o: ["0h", "0x", "0o", "0hex"], a: 1, t: "Integers" },
+            { q: "What is the decimal value of the hexadecimal literal 0x123?", o: ["291", "123", "456", "300"], a: 0, t: "Integers" },
+            { q: "Are positive numbers required to be preceded by a plus (+) sign in Python?", o: ["Yes, always", "No, but it is permissible", "Only for hex values", "Only for octal values"], a: 1, t: "Integers" },
+            { q: "What is prohibited when writing an integer string to ensure readability in Python?", o: ["Underscores", "Digits", "Interjecting non-digit characters like commas", "Minus sign"], a: 2, t: "Integers" },
+            
+            // FLOATS
+            { q: "Which data type stores numbers with a non-empty decimal fraction?", o: ["Integer", "String", "Float", "Boolean"], a: 2, t: "Floats" },
+            { q: "In Python, which character technically transforms a number into a float?", o: ["Comma (,)", "Point (.)", "Exponent (E)", "Both Point and E/e"], a: 3, t: "Floats" },
+            { q: "How would the computer read 'two and a half' as a numeric literal?", o: ["2,5", "2.5", "2 1/2", "2-5"], a: 1, t: "Floats" },
+            { q: "What is the correct way to write the shorthand for 4.0 in Python?", o: ["4", "4.", ".4", "0.4"], a: 1, t: "Floats" },
+            { q: "In scientific notation like 3E8, what must the 'exponent' (value after E) be?", o: ["Float", "String", "Integer", "Boolean"], a: 2, t: "Floats" },
+            { q: "In the literal 6.62607E-34, what is the value in front of the E called?", o: ["Exponent", "Base", "Literal", "Prefix"], a: 1, t: "Floats" },
+            { q: "What notation will Python choose for print(0.0000000000000000000001)?", o: ["0.000...1", "1e-22", "1E-22", "1x10-22"], a: 1, t: "Floats" },
+            
+            // STRINGS
+            { q: "Which characters are required to enclose a text to make it a valid String?", o: ["Parentheses ()", "Brackets []", "Quotes (\"\")", "Slashes //"], a: 2, t: "Strings" },
+            { q: "Which character acts as the 'escape character' in Python strings?", o: ["Slash (/)", "Backslash (\\)", "Asterisk (*)", "Caret (^)"], a: 1, t: "Strings" },
+            { q: "How do you embed a quote (\") inside a string delimited by quotes without ending the string?", o: ["Add another quote", "Use the backslash (\\\")", "Use a comma", "It's not possible"], a: 1, t: "Strings" },
+            { q: "If a string starts with an apostrophe ('), it must end with a/an:", o: ["Double quote", "Apostrophe", "Semicolon", "Period"], a: 1, t: "Strings" },
+            { q: "What is the result of print(\"I'm not going to give up.\")?", o: ["Syntax Error", "I'm not going to give up.", "I\"m not going to give up.", "Error: mismatched quotes"], a: 1, t: "Strings" },
+            { q: "What happens to a quote preceded by a backslash inside a string?", o: ["It ends the string", "It becomes a literal quote, not a delimiter", "It creates a new line", "It is deleted"], a: 1, t: "Strings" },
+
+            // BOOLEANS
+            { q: "Who is the author of 'The Laws of Thought', the foundation of Boolean algebra?", o: ["Alan Turing", "George Boole", "Guido van Rossum", "John von Neumann"], a: 1, t: "Booleans" },
+            { q: "Boolean values represent which two distinct states?", o: ["1 and 2", "True and False", "Yes and No", "Open and Closed"], a: 1, t: "Booleans" },
+            { q: "What are the strict binary denotations for True and False?", o: ["1 and 2", "1 and 0", "T and F", "On and Off"], a: 1, t: "Booleans" },
+            { q: "Are Python Boolean values (True/False) case-sensitive?", o: ["No", "Yes", "Only inside functions", "Only in older versions"], a: 1, t: "Booleans" },
+            { q: "Why is Python sometimes referred to as a 'binary reptile' in the context of Booleans?", o: ["Because it's named after a snake", "Because True/False have strict denotations", "Because it uses 8-bit logic", "Because it is green"], a: 1, t: "Booleans" },
+
+            // EXPRESSIONS (Handout 06)
+            { q: "What is a combination of values, variables, operators, and function calls that result in a computed value?", o: ["Literal", "Statement", "Expression", "Logic"], a: 2, t: "Expressions" },
+            { q: "What is the term for the values or variables being used with an operator?", o: ["Operators", "Operands", "Results", "Functions"], a: 1, t: "Expressions" },
+            { q: "Which type of expression involves math operations like (+), (-), and (*)?", o: ["Logical", "Relational", "Arithmetic", "Bitwise"], a: 2, t: "Expressions" },
+            { q: "What is the result of the complex expression (10 + 5) * 2 - 3 / 1.5?", o: ["27.0", "28.5", "30.0", "25.0"], a: 0, t: "Expressions" },
+            { q: "Which expressions utilize operators like (==), (!=), and (>)?", o: ["Arithmetic", "Relational", "Logical", "Assignment"], a: 1, t: "Expressions" },
+            { q: "What is the output of the relational expression print(4 == 5)?", o: ["True", "False", "Error", "None"], a: 1, t: "Expressions" },
+            { q: "Which logical operator returns True only if both Boolean values are True?", o: ["or", "not", "and", "xor"], a: 2, t: "Expressions" },
+            { q: "Bitwise expressions manipulate data at what level?", o: ["Text level", "Binary/Bit level", "High-level objects", "Logical level"], a: 1, t: "Expressions" },
+            { q: "The operator (^) in bitwise expressions represents:", o: ["AND", "OR", "XOR", "NOT"], a: 2, t: "Expressions" },
+            { q: "What does (<<) represent in bitwise operations?", o: ["Left shift", "Right shift", "Double less than", "Import"], a: 0, t: "Expressions" },
+
+            // ASSIGNMENT STATEMENTS
+            { q: "Which operator is used to assign a value to a variable?", o: ["==", "=", "=>", ":="], a: 1, t: "Assignment" },
+            { q: "In the statement 'x = 5', what is 'x'?", o: ["The value", "The operator", "The variable name", "An operand"], a: 2, t: "Assignment" },
+            { q: "What is the result of a, b, c = 1, 2, 3?", o: ["Error", "a=1, b=2, c=3", "a,b,c all equal 3", "a=3, b=2, c=1"], a: 1, t: "Assignment" },
+            { q: "How can you swap the values of x and y without a temporary variable in Python?", o: ["swap(x, y)", "x, y = y, x", "x = y; y = x", "x <=> y"], a: 1, t: "Assignment" },
+            
+            // AUGMENTED ASSIGNMENT
+            { q: "What is the concise syntax 'x += 5' equivalent to?", o: ["x = 5", "x = x + 5", "x + 5 = x", "x == 5"], a: 1, t: "Augmented" },
+            { q: "Which operator is used for subtraction assignment?", o: ["-=", "= -", "--", "!-"], a: 0, t: "Augmented" },
+            { q: "What is the equivalent of a *= b?", o: ["a = a * b", "a = b * b", "a = a ** b", "a = a / b"], a: 0, t: "Augmented" },
+            { q: "Which operator stands for Division assignment?", o: ["%=", "/=", "//=", "\\="], a: 1, t: "Augmented" },
+            { q: "What does the (//=) operator represent?", o: ["Division", "Floor Division", "Modulus", "Exponentiation"], a: 1, t: "Augmented" },
+            { q: "Which operator updates a variable with the remainder of a division?", o: ["/=", "//=", "%=", "rem="], a: 2, t: "Augmented" },
+            { q: "The operator (**=) is used for what?", o: ["Multiplication", "Double pointer", "Exponentiation", "Square root"], a: 2, t: "Augmented" },
+            { q: "Which augmented operator performs a bitwise AND?", o: ["|=", "&=", "^=", "&&="], a: 1, t: "Augmented" },
+            { q: "What is a |= b equivalent to?", o: ["a = a OR b (Bitwise)", "a = a AND b", "a = a + b", "a = a XOR b"], a: 0, t: "Augmented" },
+            { q: "What does (<<=) do?", o: ["Compares less than", "Left shift assignment", "Double arrow", "Right shift assignment"], a: 1, t: "Augmented" },
+            { q: "If x = 10 and you run x += 3, what is the value of x?", o: ["10", "3", "13", "30"], a: 2, t: "Augmented" },
+            { q: "If x = 10 and you run x *= 2, what is the value of x?", o: ["12", "20", "100", "5"], a: 1, t: "Augmented" },
+            { q: "If x = 10 and you run x -= 10, what is the value of x?", o: ["10", "0", "-10", "20"], a: 1, t: "Augmented" },
+
+            // CORE CONCEPTS
+            { q: "What is the value produced when an expression is evaluated by Python?", o: ["A variable", "A computed value", "A statement", "An error"], a: 1, t: "Core" },
+            { q: "Where are values stored in an assignment statement?", o: ["In the CPU", "In named memory locations (variables)", "In a text file", "In the console"], a: 1, t: "Core" },
+            { q: "A relational expression (10 > 5) results in which Boolean value?", o: ["True", "False", "10", "5"], a: 0, t: "Core" },
+            { q: "Which operator combines Boolean values and returns True if at least one is True?", o: ["and", "or", "not", "is"], a: 1, t: "Core" },
+            { q: "What is the equivalent of a >>= b?", o: ["a = a << b", "a = a >> b", "a = b >> a", "a > b"], a: 1, t: "Augmented" },
+            { q: "In the expression def square(n): return n*n, what is returned for square(4)?", o: ["4", "8", "16", "32"], a: 2, t: "Core" },
+            { q: "Which prefix identifies an octal literal?", o: ["0x", "0o", "zero-o", "Both 0o and zero-o"], a: 3, t: "Integers" },
+            { q: "What does Python choose for float presentation when many zeros are involved?", o: ["The longest form", "The most economical form", "Standard decimal", "Binary"], a: 1, t: "Floats" },
+            { q: "Can integer base values be used in scientific notation (e.g., 3E8)?", o: ["No, must be float", "Yes", "Only for hex", "Only for strings"], a: 1, t: "Floats" },
+            { q: "What happens if you open a string with a double quote (\") and close it with a single quote (')?", o: ["It works", "Syntax Error", "Python converts it", "It becomes a boolean"], a: 1, t: "Strings" },
+            { q: "Who defined Boolean algebra as a part of algebra using only two values?", o: ["George Boole", "John Boole", "Henry Boole", "Arthur Boole"], a: 0, t: "Booleans" },
+            { q: "What is the Bitwise NOT operator?", o: ["&", "|", "~", "^"], a: 2, t: "Expressions" },
+            { q: "Relational expressions are also known as ________ expressions.", o: ["Math", "Comparison", "Logical", "Arithmetic"], a: 1, t: "Expressions" }
+        ];
+
+        // Shuffle Utility
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Prep Quiz
+        const quizData = quizBank.map(item => {
+            const correctText = item.o[item.a];
+            const shuffledOptions = shuffle([...item.o]);
+            return {
+                ...item,
+                o: shuffledOptions,
+                a: shuffledOptions.indexOf(correctText)
+            };
+        });
+        shuffle(quizData);
+
+        let currentIndex = 0;
+        let answers = new Array(quizData.length).fill(null);
+
+        const dom = {
+            qText: document.getElementById('question-text'),
+            options: document.getElementById('options-grid'),
+            currentIdx: document.getElementById('current-count'),
+            score: document.getElementById('score-display'),
+            progLine: document.getElementById('progress-line'),
+            feedback: document.getElementById('feedback-area'),
+            topic: document.getElementById('topic-tag'),
+            btnPrev: document.getElementById('btn-prev'),
+            btnNext: document.getElementById('btn-next'),
+            quizUI: document.getElementById('quiz-ui'),
+            resultUI: document.getElementById('result-ui'),
+            finalScore: document.getElementById('final-score'),
+            perfComment: document.getElementById('performance-comment'),
+            wrapper: document.getElementById('question-wrapper')
+        };
+
+        function getScore() {
+            const correct = answers.filter((val, i) => val === quizData[i].a).length;
+            const attempted = answers.filter(v => v !== null).length;
+            return { correct, attempted, perc: attempted > 0 ? Math.round((correct / attempted) * 100) : 0 };
+        }
+
+        function render() {
+            const data = quizData[currentIndex];
+            const chosen = answers[currentIndex];
+            const stats = getScore();
+
+            dom.qText.innerText = data.q;
+            dom.topic.innerText = data.t;
+            dom.currentIdx.innerText = `${currentIndex + 1} / ${quizData.length}`;
+            dom.score.innerText = `${stats.perc}%`;
+            dom.progLine.style.width = `${((currentIndex) / quizData.length) * 100}%`;
+            
+            dom.btnPrev.disabled = currentIndex === 0;
+            dom.btnNext.innerText = currentIndex === quizData.length - 1 ? "FINISH" : "NEXT QUESTION";
+            dom.btnNext.disabled = chosen === null;
+
+            dom.options.innerHTML = '';
+            dom.feedback.innerHTML = '';
+
+            const labels = ['A', 'B', 'C', 'D'];
+            data.o.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerHTML = `<span class="option-num">${labels[i]}</span> <span>${opt}</span>`;
+                
+                if (chosen !== null) {
+                    btn.disabled = true;
+                    if (i === data.a) btn.classList.add('correct');
+                    else if (i === chosen) btn.classList.add('wrong');
+                } else {
+                    btn.onclick = () => {
+                        answers[currentIndex] = i;
+                        render();
+                    };
+                }
+                dom.options.appendChild(btn);
+            });
+
+            if (chosen !== null) {
+                const isCorrect = chosen === data.a;
+                dom.feedback.innerHTML = isCorrect ? 
+                    '<span class="text-emerald-400">Correct logic applied.</span>' : 
+                    `<span class="text-rose-400">Incorrect. Correct answer: ${data.o[data.a]}</span>`;
+            }
+
+            dom.wrapper.classList.remove('fade-in');
+            void dom.wrapper.offsetWidth;
+            dom.wrapper.classList.add('fade-in');
+        }
+
+        dom.btnNext.onclick = () => {
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                showResults();
+            }
+        };
+
+        dom.btnPrev.onclick = () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                render();
+            }
+        };
+
+        function showResults() {
+            dom.quizUI.classList.add('hidden');
+            dom.resultUI.classList.remove('hidden');
+            const stats = getScore();
+            dom.finalScore.innerText = `${stats.correct} / ${quizData.length}`;
+            
+            if (stats.perc === 100) dom.perfComment.innerText = "Python Master";
+            else if (stats.perc >= 85) dom.perfComment.innerText = "Advanced Developer";
+            else if (stats.perc >= 70) dom.perfComment.innerText = "Competent Coder";
+            else dom.perfComment.innerText = "Keep Reviewing";
+        }
+
+        render();
+    </script>
+</body>
+</html>
