@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assembly Language Reviewer - IT2104</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --surface-color: #0f172a;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #6366f1;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.08) 0, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.08) 0, transparent 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .btn-option {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            width: 100%;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .option-num {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .btn-option.correct {
+            background: rgba(34, 197, 94, 0.1) !important;
+            border-color: var(--correct) !important;
+            color: var(--correct) !important;
+        }
+        .btn-option.correct .option-num { background: var(--correct); color: white; }
+
+        .btn-option.wrong {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: var(--wrong) !important;
+            color: var(--wrong) !important;
+        }
+        .btn-option.wrong .option-num { background: var(--wrong); color: white; }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
+
+        code {
+            background: #000;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.4rem;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="glass-card p-12 text-center fade-in">
+        <div class="mb-8 inline-block p-4 rounded-3xl bg-indigo-500/10 text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+        </div>
+        <h1 class="text-4xl font-extrabold mb-4">Assembly Reviewer</h1>
+        <p class="text-slate-400 text-lg mb-10 max-w-md mx-auto">
+            Comprehensive exam coverage for <span class="text-sky-400 font-semibold">IT2104 Handout 1</span>. 
+            Test your knowledge on <code>CALL</code>, <code>RET</code>, <code>JMP</code>, and <code>LOOP</code> instructions.
+        </p>
+        <button onclick="startQuiz()" class="primary-btn">
+            Initialize Challenge
+        </button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="glass-card hidden fade-in">
+        <div class="progress-container">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <div class="p-8 md:p-12">
+            <div class="flex justify-between items-center mb-8">
+                <span id="topic-badge" class="px-3 py-1 bg-sky-500/10 text-sky-400 text-xs font-bold uppercase tracking-widest rounded-lg border border-sky-500/20">
+                    Procedural Calls
+                </span>
+                <span id="q-counter" class="text-slate-500 text-sm font-mono">01 / 40</span>
+            </div>
+
+            <h2 id="question-text" class="text-2xl md:text-3xl font-bold leading-snug mb-10 text-slate-100">
+                Loading...
+            </h2>
+
+            <div id="options-container" class="grid grid-cols-1 gap-4">
+                <!-- Options injected here -->
+            </div>
+
+            <div class="mt-10 flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden primary-btn py-3 px-8 text-sm">
+                    Continue →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="glass-card hidden p-12 text-center fade-in">
+        <h2 class="text-4xl font-black mb-2 text-white">Execution Halted</h2>
+        <p class="text-slate-400 mb-12">Final analysis of your session.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="stat-box">
+                <div class="text-slate-500 text-xs font-bold uppercase mb-2">Accuracy</div>
+                <div id="res-percent" class="text-3xl font-black text-sky-400">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="text-slate-500 text-xs font-bold uppercase mb-2">Correct</div>
+                <div id="res-correct" class="text-3xl font-black text-green-400">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="text-slate-500 text-xs font-bold uppercase mb-2">Errors</div>
+                <div id="res-wrong" class="text-3xl font-black text-rose-400">0</div>
+            </div>
+        </div>
+
+        <p id="res-feedback" class="text-slate-300 text-lg italic mb-10 px-4"></p>
+
+        <button onclick="location.reload()" class="primary-btn">
+            Restart Module
+        </button>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "What is considered the most important innovation in the development of programming languages?", a: ["Variables", "Loops", "Procedures", "Directives"], c: 2, t: "Procedural Calls" },
+            { q: "A procedure is also known as a:", a: ["Main Program", "Subroutine", "Instruction Queue", "Data Segment"], c: 1, t: "Procedural Calls" },
+            { q: "Which of the following is NOT a characteristic of a procedure?", a: ["Code reuse", "Efficient storage use", "Easier programming tasks", "Single call location only"], c: 3, t: "Procedural Calls" },
+            { q: "Where can the return address be stored for a procedural call?", a: ["Register", "Start of called procedure", "Top of stack", "All of the above"], c: 3, t: "Procedural Calls" },
+            { q: "A procedure that can be executed by multiple processes simultaneously without conflict is called:", a: ["Nested", "Recursive", "Reentrant", "Far"], c: 2, t: "Procedural Calls" },
+            { q: "What complicates the utilization of reentrant procedures?", a: ["Using a stack", "Storing return address in registers", "Instruction queuing", "Direct branching"], c: 1, t: "Procedural Calls" },
+            { q: "Which instruction branches from the present location to a procedure?", a: ["<code>JMP</code>", "<code>RET</code>", "<code>CALL</code>", "<code>MOV</code>"], c: 2, t: "CALL & RET" },
+            { q: "What happens to the instruction queue inside the microprocessor during a <code>CALL</code>?", a: ["It is filled", "It is doubled", "It is emptied", "It stays the same"], c: 2, t: "CALL & RET" },
+            { q: "In a <code>CALL</code>, what register is updated with the entry point address?", a: ["<code>SP</code>", "<code>CX</code>", "<code>IP</code>", "<code>DS</code>"], c: 2, t: "CALL & RET" },
+            { q: "What is a <code>Near CALL</code>?", a: ["Different code segment", "Same code segment", "Inside the stack", "External memory only"], c: 1, t: "CALL & RET" },
+            { q: "What instruction pushes the current <code>IP</code> onto the stack and jumps to any memory location?", a: ["<code>CALL Address</code>", "<code>CALL Label (Near)</code>", "<code>CALL Memory (Far)</code>", "<code>SHORT JMP</code>"], c: 2, t: "CALL & RET" },
+            { q: "What is the technical last instruction in any procedure?", a: ["<code>STOP</code>", "<code>RET</code>", "<code>EXIT</code>", "<code>HLT</code>"], c: 1, t: "CALL & RET" },
+            { q: "What is popped from the stack into the <code>IP</code> during a <code>RET</code>?", a: ["The parameter", "The return address", "The flag status", "The stack pointer"], c: 1, t: "CALL & RET" },
+            { q: "<code>RETF</code> stands for:", a: ["Fast Return", "Failed Return", "Far Return", "Formal Return"], c: 2, t: "CALL & RET" },
+            { q: "Which branch type contains the actual target address as an operand?", a: ["Indirect", "Direct", "Relative", "Conditional"], c: 1, t: "Branching" },
+            { q: "Relative branching specifies the difference between the current and:", a: ["Stack address", "Target address", "Segment address", "Link address"], c: 1, t: "Branching" },
+            { q: "A branch with a higher address than the current one is:", a: ["Backward", "Lateral", "Forward", "Downward"], c: 2, t: "Branching" },
+            { q: "What are the two categories of branch instructions?", a: ["Direct/Indirect", "Unconditional/Conditional", "Internal/External", "Signed/Unsigned"], c: 1, t: "Branching" },
+            { q: "In conditional branching, if the condition is NOT satisfied, the processor executes:", a: ["Target instruction", "Instruction following the branch", "The whole loop", "The reset vector"], c: 1, t: "Branching" },
+            { q: "Jump instructions transfer program sequence based on:", a: ["CX value", "Specified flag", "Stack depth", "Instruction size"], c: 1, t: "Jump Instructions" },
+            { q: "Which <code>JMP</code> targets memory within the same segment with a 1-byte offset?", a: ["Near JMP", "Short JMP", "Far JMP", "Remote JMP"], c: 1, t: "Jump Instructions" },
+            { q: "What is the <code>IP</code> size for a <code>Far JMP</code>?", a: ["Byte", "Word", "Double Word", "Quad Word"], c: 2, t: "Jump Instructions" },
+            { q: "Which flag represents 'Carry'?", a: ["<code>P</code>", "<code>A</code>", "<code>Z</code>", "<code>C</code>"], c: 3, t: "Flags" },
+            { q: "<code>JA Label</code> (Unsigned) jumps if:", a: ["<code>C=1</code>", "<code>C=0 and Z=0</code>", "<code>Z=1</code>", "<code>S=0</code>"], c: 1, t: "Conditionals" },
+            { q: "<code>JB Label</code> triggers a jump if:", a: ["Carry is 0", "Carry is 1", "Zero is 1", "Parity is 0"], c: 1, t: "Conditionals" },
+            { q: "<code>JE Label</code> triggers a jump if:", a: ["<code>Z=0</code>", "<code>Z=1</code>", "<code>S=1</code>", "<code>C=1</code>"], c: 1, t: "Conditionals" },
+            { q: "<code>JMP 1234h:5678h</code> is an example of:", a: ["Conditional Jump", "Unconditional Jump", "Short Jump", "Near Jump"], c: 1, t: "Jump Instructions" },
+            { q: "<code>JNP Label</code> jumps if parity is:", a: ["Even", "Odd (No Parity)", "Zero", "Overflowed"], c: 1, t: "Conditionals" },
+            { q: "<code>JS Label</code> jumps if the sign is:", a: ["Positive", "Negative", "Neutral", "Non-zero"], c: 1, t: "Conditionals" },
+            { q: "<code>JO Label</code> stands for jump if:", a: ["Operand is zero", "Odd parity", "Overflow", "Offset set"], c: 2, t: "Conditionals" },
+            { q: "What register is used for looping instructions?", a: ["<code>AX</code>", "<code>BX</code>", "<code>CX</code>", "<code>DX</code>"], c: 2, t: "Iterations" },
+            { q: "The <code>LOOP Label</code> instruction decreases <code>CX</code> and jumps if:", a: ["<code>CX</code> is zero", "<code>CX</code> is not zero", "<code>Z=1</code>", "<code>C=0</code>"], c: 1, t: "Iterations" },
+            { q: "Algorithm for <code>LOOPE</code>:", a: ["<code>CX=CX-1</code>; Jump if <code>CX!=0</code> and <code>Z=1</code>", "<code>CX=CX-1</code>; Jump if <code>CX=0</code>", "<code>CX=CX+1</code>; Jump if <code>Z=0</code>", "<code>CX=CX-1</code>; Jump if <code>CX!=0</code> and <code>Z=0</code>"], c: 0, t: "Iterations" },
+            { q: "<code>JCXZ Label</code> jumps if:", a: ["Carry is zero", "<code>CX</code> register is zero", "<code>CX</code> is not zero", "Sign flag is zero"], c: 1, t: "Iterations" },
+            { q: "<code>LOOPNE</code> jumps if <code>CX</code> is not zero and <code>Z</code> is:", a: ["One", "Zero (Not Equal)", "Negative", "None"], c: 1, t: "Iterations" },
+            { q: "In iterations, repeated referencing to a small set of instructions occurs in:", a: ["Data segments", "Registers", "Loops and subroutines", "Input/Output"], c: 2, t: "Iterations" },
+            { q: "When <code>RET</code> has an immediate operand, the stack pointer (<code>SP</code>) is updated as:", a: ["<code>SP = SP - operand</code>", "<code>SP = SP + operand</code>", "<code>SP = SP * 2</code>", "<code>SP</code> remains same"], c: 1, t: "CALL & RET" },
+            { q: "A target address found in the count register is used for computing:", a: ["Branch targets", "Direct jumps", "Stack offsets", "Memory segments"], c: 0, t: "Branching" },
+            { q: "In 8086, a <code>Short JMP</code> offset is how many bits?", a: ["4-bit", "8-bit", "16-bit", "32-bit"], c: 1, t: "Jump Instructions" },
+            { q: "The condition <code>If C=1 or Z=1</code> applies to which unsigned jump?", a: ["<code>JB</code>", "<code>JA</code>", "<code>JBE</code>", "<code>JAE</code>"], c: 2, t: "Conditionals" }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const data = questions[currentIdx];
+            
+            document.getElementById('topic-badge').innerText = data.t;
+            document.getElementById('q-counter').innerText = `${String(currentIdx + 1).padStart(2, '0')} / 40`;
+            document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+            document.getElementById('question-text').innerHTML = data.q;
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            data.a.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-option";
+                btn.innerHTML = `
+                    <div class="option-num">${String.fromCharCode(65 + i)}</div>
+                    <div class="option-text">${opt}</div>
+                `;
+                btn.onclick = () => selectOption(i, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(i, btn) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const correct = questions[currentIdx].c;
+            const btns = document.querySelectorAll('.btn-option');
+
+            if (i === correct) {
+                score++;
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+                btns[correct].classList.add('correct');
+            }
+
+            btns.forEach(b => b.disabled = true);
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const percent = Math.round((score / questions.length) * 100);
+            document.getElementById('res-percent').innerText = `${percent}%`;
+            document.getElementById('res-correct').innerText = score;
+            document.getElementById('res-wrong').innerText = questions.length - score;
+
+            let feedback = "";
+            if (percent >= 90) feedback = "Outstanding performance. Your understanding of processor control flow is excellent.";
+            else if (percent >= 75) feedback = "Solid grasp of Assembly principles. Ready for the exam.";
+            else if (percent >= 50) feedback = "Passing score, but review the Flag conditions and Loop algorithms.";
+            else feedback = "Re-evaluation recommended. Focus on the differences between Near and Far calls.";
+            
+            document.getElementById('res-feedback').innerText = feedback;
+        }
+    </script>
+</body>
+</html>
