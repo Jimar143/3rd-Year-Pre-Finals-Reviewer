@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,7 +108,7 @@
                 <p class="text-slate-500 text-sm">Testing & Deployment (Full Review)</p>
             </div>
             <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all">
-                Shuffle & Restart
+                Reset Progress
             </button>
         </div>
 
@@ -158,8 +158,8 @@
     </div>
 
     <script>
-        // All possible questions derived from the 4-page handout
-        const rawData = [
+        // Questions derived from the handout
+        const quizData = [
             // Page 1: Fundamentals
             { q: "What is the process of examining a component, subsystem, or system to determine its operational characteristics and whether it contains defects?", o: ["Implementation", "Testing", "Deployment", "Maintenance"], a: 1, t: "Testing Basics" },
             { q: "To conduct a test, developers must have well-defined ________ for both functional and non-functional requirements.", o: ["Programming tools", "Specifications", "Budget plans", "Marketing strategies"], a: 1, t: "Testing Basics" },
@@ -222,27 +222,6 @@
             { q: "In Figure 6, what is the purpose of running systems in parallel?", o: ["To double the cost", "To test until the new system is determined error-free", "To confuse the users", "To use more power"], a: 1, t: "Figures" },
             { q: "During each phase of a Phased Deployment, what is done to ensure readiness for the next phase?", o: ["The system is tested", "The system is deleted", "The code is rewritten", "The database is cleared"], a: 0, t: "Figures" }
         ];
-
-        // Shuffle logic (Fisher-Yates)
-        function shuffle(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        // Initialize quiz data with shuffled options and shuffled questions
-        const quizData = rawData.map(item => {
-            const correctText = item.o[item.a];
-            const shuffledOptions = shuffle([...item.o]);
-            return {
-                ...item,
-                o: shuffledOptions,
-                a: shuffledOptions.indexOf(correctText)
-            };
-        });
-        shuffle(quizData);
 
         let currentIndex = 0;
         let answers = new Array(quizData.length).fill(null);
@@ -317,6 +296,7 @@
             if (currentIndex < quizData.length - 1) {
                 currentIndex++;
                 render();
+                window.scrollTo(0,0);
             } else {
                 showResults();
             }
@@ -326,6 +306,7 @@
             if (currentIndex > 0) {
                 currentIndex--;
                 render();
+                window.scrollTo(0,0);
             }
         };
 
