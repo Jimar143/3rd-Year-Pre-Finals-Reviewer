@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT2207: ASP.NET MVC Master Reviewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --surface-color: #0f172a;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #6366f1;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.08) 0, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.08) 0, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-option {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-option.selected {
+            border-color: var(--accent-primary);
+            background: rgba(14, 165, 233, 0.15);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+        }
+
+        .option-num {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .btn-option.selected .option-num {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+        }
+
+        code {
+            background: #000;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 1.25rem;
+        }
+
+        .review-item {
+            border-left: 4px solid #334155;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+        }
+
+        .review-item.is-correct { border-left-color: var(--correct); }
+        .review-item.is-wrong { border-left-color: var(--wrong); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-center">
+        <!-- Start Screen -->
+        <div id="start-screen" class="glass-card p-8 md:p-12 text-center fade-in">
+            <div class="mb-8 inline-flex items-center justify-center p-4 bg-sky-500/10 rounded-3xl border border-sky-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
+                IT2207 Master Quiz
+            </h1>
+            <p class="text-slate-400 text-lg mb-10 max-w-lg mx-auto">
+                Review your ASP.NET MVC knowledge with automated answer validation.
+            </p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-10 max-w-md mx-auto">
+                <div class="stat-box">
+                    <p class="text-xs font-bold text-sky-500 uppercase tracking-widest mb-1">Items</p>
+                    <p class="text-2xl font-black">40</p>
+                </div>
+                <div class="stat-box">
+                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Mode</p>
+                    <p class="text-2xl font-black">Interactive</p>
+                </div>
+            </div>
+
+            <button id="start-btn" class="px-10 py-4 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-2xl transition-all shadow-[0_0_30px_rgba(14,165,233,0.3)] active:scale-95 text-lg">
+                BEGIN EXAM
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden flex flex-col gap-6 fade-in">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-sm font-bold text-sky-500 uppercase tracking-widest mb-1">System Core</h2>
+                    <p class="text-2xl font-bold">Item <span id="q-num">1</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 font-mono" id="q-timer">00:00</p>
+                    <p class="text-lg font-bold text-indigo-400" id="q-percent">0%</p>
+                </div>
+            </div>
+
+            <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                <div id="q-progress" class="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div class="glass-card p-8 md:p-10 flex flex-col min-h-[450px]">
+                <h3 id="q-text" class="text-2xl font-bold leading-relaxed mb-8 text-slate-100"></h3>
+                <div id="options-grid" class="grid gap-3 mt-auto"></div>
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <button id="prev-btn" class="px-6 py-3 font-bold text-slate-500 hover:text-slate-300 disabled:opacity-0 transition">
+                    PREVIOUS
+                </button>
+                <button id="next-btn" class="px-10 py-3 text-white font-black bg-indigo-600 hover:bg-indigo-500 rounded-xl transition shadow-lg shadow-indigo-500/20 active:scale-95">
+                    NEXT
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden glass-card p-10 text-center fade-in">
+            <h2 class="text-3xl font-black mb-8 text-sky-400">System Result</h2>
+            
+            <div class="flex justify-center mb-10">
+                <div class="relative w-48 h-48 flex items-center justify-center">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="96" cy="96" r="88" stroke="rgba(255,255,255,0.05)" stroke-width="12" fill="transparent" />
+                        <circle id="res-circle" cx="96" cy="96" r="88" stroke="var(--accent-primary)" stroke-width="12" fill="transparent" stroke-dasharray="553" stroke-dashoffset="553" class="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div class="absolute flex flex-col">
+                        <span id="res-score" class="text-5xl font-black text-white">0/0</span>
+                        <span class="text-slate-500 font-bold uppercase tracking-widest text-xs mt-1">Final Sync</span>
+                    </div>
+                </div>
+            </div>
+
+            <p id="res-msg" class="text-xl font-bold mb-10 text-slate-300 italic"></p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="stat-box">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Time Spent</p>
+                    <p class="text-xl font-bold" id="res-time">00:00</p>
+                </div>
+                <div class="stat-box">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Grade</p>
+                    <p class="text-xl font-bold" id="res-percent-text">0%</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button id="view-review-btn" class="w-full py-4 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20 rounded-2xl font-bold transition">
+                    VIEW ANSWER KEY
+                </button>
+                <button onclick="location.reload()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition">
+                    RESTART SYSTEM
+                </button>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div id="review-screen" class="hidden flex flex-col gap-6 fade-in mb-10">
+            <div class="flex justify-between items-center">
+                <h2 class="text-3xl font-black text-white">Review Center</h2>
+                <button onclick="location.reload()" class="text-sky-400 font-bold hover:underline">Back to Home</button>
+            </div>
+            <div id="review-list" class="flex flex-col gap-4"></div>
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            { q: "What design approach is ASP.NET Web Forms based on?", options: ["MVC approach", "Web page approach", "Action-based approach", "Logic-first approach"], correct: 1 },
+            { q: "What core concept does ASP.NET MVC emphasize?", options: ["Data binding", "Separation of concerns", "File system linkage", "Event handlers"], correct: 1 },
+            { q: "Which part of MVC represents the data being displayed?", options: ["Controller", "View", "Model", "Router"], correct: 2 },
+            { q: "Which component is the intermediary that connects models and views?", options: ["View", "Database", "Controller", "Service"], correct: 2 },
+            { q: "Which component determines how data is displayed to the user?", options: ["Model", "View", "Controller", "Browser"], correct: 1 },
+            { q: "MVC presents ____ to the client, rather than physical pages.", options: ["Forms", "Scripts", "Views", "Routes"], correct: 2 },
+            { q: "Where does the <code>UI-specific logic</code> belong in an MVC application?", options: ["Controller", "Model", "View", "App_Start"], correct: 2 },
+            { q: "Where does the <code>Input logic</code> (handling client requests) belong?", options: ["View", "Controller", "Model", "Global.asax"], correct: 1 },
+            { q: "Where does the <code>Business logic</code> belong in MVC?", options: ["Model layer", "View layer", "Controller layer", "CSS folder"], correct: 0 },
+            { q: "What is the file extension for a C# Razor view file?", options: [".vbhtml", ".cshtml", ".asax", ".config"], correct: 1 },
+            { q: "Which folder holds configuration files like <code>RouteConfig.cs</code>?", options: ["App_Data", "Content", "App_Start", "Scripts"], correct: 2 },
+            { q: "Which folder is generally used for data storage (e.g., SQL .mdf files)?", options: ["App_Data", "App_Start", "Models", "Fonts"], correct: 0 },
+            { q: "Which folder contains items like CSS that will be sent to the client?", options: ["Scripts", "Content", "Fonts", "Models"], correct: 1 },
+            { q: "What file handles application and session-level events like creating routes?", options: ["Web.config", "Global.asax", "RouteConfig.cs", "Controller.cs"], correct: 1 },
+            { q: "Starting in Visual Studio ____, we can use both Web Forms and MVC together.", options: ["2015", "2017", "2019", "2021"], correct: 2 },
+            { q: "MVC takes an approach where content is based on the ____ you are performing.", options: ["File name", "Type of action", "Data size", "User role"], correct: 1 },
+            { q: "What folder stores JavaScript files sent to the client browser?", options: ["Content", "Scripts", "Models", "App_Data"], correct: 1 },
+            { q: "What folder holds the glyph-fonts used in the default application?", options: ["Content", "Scripts", "Fonts", "Models"], correct: 2 },
+            { q: "What is <code>Razor</code> in ASP.NET MVC?", options: ["A database language", "A syntax for embedding server-based code", "A CSS preprocessor", "A JS library"], correct: 1 },
+            { q: "Which character is used to switch from HTML to C# code in Razor?", options: ["$", "#", "@", "%"], correct: 2 },
+            { q: "How are multi-statement code blocks enclosed in Razor?", options: ["[ ]", "<% %>", "@{ }", "/* */"], correct: 2 },
+            { q: "Inside a Razor code block, each statement must end with a ____.", options: ["Colon", "Semicolon", "Comma", "Period"], correct: 1 },
+            { q: "Which component is in charge of managing which views are called?", options: ["Model", "View", "Controller", "Routing Engine"], correct: 2 },
+            { q: "Which file defines the URL pattern and handler information?", options: ["Web.config", "Global.asax", "RouteConfig.cs", "BundleConfig.cs"], correct: 2 },
+            { q: "What is the default URL pattern for routing?", options: ["{action}/{controller}/{id}", "{controller}/{action}/{id}", "{id}/{controller}/{action}", "api/{controller}/{id}"], correct: 1 },
+            { q: "Which attribute identifies a controller method for handling form POST requests?", options: ["[HttpGet]", "[HttpPost]", "[Submit]", "[ActionMethod]"], correct: 1 },
+            { q: "Which helper creates a multi-line text input field?", options: ["@Html.TextBoxFor", "@Html.TextAreaFor", "@Html.EditorFor", "@Html.LabelFor"], correct: 1 },
+            { q: "Which helper creates a standard single-line text input?", options: ["@Html.InputFor", "@Html.TextBoxFor", "@Html.HiddenFor", "@Html.PasswordFor"], correct: 1 },
+            { q: "Which helper creates a dropdown selection box?", options: ["@Html.ListBoxFor", "@Html.DropDownListFor", "@Html.ComboBoxFor", "@Html.SelectFor"], correct: 1 },
+            { q: "Which helper creates a field that holds data not visible in the UI?", options: ["@Html.PrivateFor", "@Html.SecretFor", "@Html.HiddenFor", "@Html.InvisibleFor"], correct: 2 },
+            { q: "Which helper obscures typed content for security?", options: ["@Html.PasswordFor", "@Html.SecureFor", "@Html.MaskedFor", "@Html.TextFor"], correct: 0 },
+            { q: "Which helper creates a radio button?", options: ["@Html.RadioButtonFor", "@Html.OptionFor", "@Html.CheckBoxFor", "@Html.InputFor"], correct: 0 },
+            { q: "The <code>EditorFor</code> helper checks the ____ of the property to render the element.", options: ["Name", "Length", "Data type", "CSS class"], correct: 2 },
+            { q: "What is the primary advantage of <code>EditorFor</code> over <code>Editor</code>?", options: ["It is faster", "It uses type-safe Lambda expressions", "It supports more browsers", "It has more styles"], correct: 1 },
+            { q: "What term refers to converting an HTTP request into action parameters?", options: ["Model Binding", "Data Mapping", "Request Parsing", "Routing"], correct: 0 },
+            { q: "In Model Binding, which source is checked FIRST by the system?", options: ["Query String", "Route data", "Form Fields", "Posted Files"], correct: 2 },
+            { q: "JSON body values are checked in binding only when the request is ____.", options: ["A POST request", "An AJAX request", "A GET request", "A File upload"], correct: 1 },
+            { q: "What is the THIRD source checked during the Model Binding process?", options: ["Form Fields", "Route data", "JSON body", "Query String"], correct: 1 },
+            { q: "What is the FIFTH (final) source checked during Model Binding?", options: ["JSON body", "Route data", "Query String", "Posted Files"], correct: 3 },
+            { q: "Which folder contains the models created as part of the template process?", options: ["App_Data", "Content", "Models", "App_Start"], correct: 2 }
+        ];
+
+        let currentIdx = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let startTime, timerInt;
+
+        // Elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const reviewScreen = document.getElementById('review-screen');
+        const optionsGrid = document.getElementById('options-grid');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const viewReviewBtn = document.getElementById('view-review-btn');
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            startTime = Date.now();
+            updateTimer();
+            timerInt = setInterval(updateTimer, 1000);
+            renderQuestion();
+        }
+
+        function updateTimer() {
+            const diff = Math.floor((Date.now() - startTime) / 1000);
+            const m = Math.floor(diff / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
+            document.getElementById('q-timer').textContent = `${m}:${s}`;
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIdx];
+            document.getElementById('q-text').innerHTML = q.q;
+            document.getElementById('q-num').textContent = currentIdx + 1;
+            
+            const p = (currentIdx / questions.length) * 100;
+            document.getElementById('q-progress').style.width = `${p}%`;
+            document.getElementById('q-percent').textContent = `${Math.round(p)}%`;
+
+            optionsGrid.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-option ${userAnswers[currentIdx] === idx ? 'selected' : ''}`;
+                btn.innerHTML = `
+                    <span class="option-num">${String.fromCharCode(65 + idx)}</span>
+                    <span class="flex-1">${opt}</span>
+                `;
+                btn.onclick = () => {
+                    userAnswers[currentIdx] = idx;
+                    renderQuestion();
+                };
+                optionsGrid.appendChild(btn);
+            });
+
+            prevBtn.disabled = currentIdx === 0;
+            nextBtn.textContent = currentIdx === questions.length - 1 ? 'FINALIZE' : 'NEXT';
+        }
+
+        function handleNext() {
+            if (userAnswers[currentIdx] === null) {
+                optionsGrid.animate([
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' }
+                ], { duration: 100, iterations: 2 });
+                return;
+            }
+            if (currentIdx < questions.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function handlePrev() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function showResults() {
+            clearInterval(timerInt);
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            let score = 0;
+            userAnswers.forEach((ans, i) => { if (ans === questions[i].correct) score++; });
+
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('res-score').textContent = `${score}/${questions.length}`;
+            document.getElementById('res-time').textContent = document.getElementById('q-timer').textContent;
+            document.getElementById('res-percent-text').textContent = `${percentage}%`;
+            
+            const offset = 553 - (553 * percentage) / 100;
+            document.getElementById('res-circle').style.strokeDashoffset = offset;
+
+            const msg = document.getElementById('res-msg');
+            if (percentage >= 90) msg.textContent = "Optimization complete. System performance perfect.";
+            else if (percentage >= 75) msg.textContent = "Stability achieved. You are ready for deployment.";
+            else msg.textContent = "Data corruption detected. Re-initialization recommended.";
+        }
+
+        function showReview() {
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.remove('hidden');
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            questions.forEach((q, i) => {
+                const isCorrect = userAnswers[i] === q.correct;
+                const div = document.createElement('div');
+                div.className = `review-item ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+                div.innerHTML = `
+                    <p class="text-sm text-slate-500 mb-2 font-mono uppercase">Question #${i+1}</p>
+                    <p class="text-lg font-bold mb-4">${q.q}</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-2 py-1 bg-slate-800 rounded text-slate-400">YOURS</span>
+                            <span class="${isCorrect ? 'text-green-400' : 'text-red-400'} font-bold">
+                                ${userAnswers[i] !== null ? q.options[userAnswers[i]] : 'No Answer'}
+                            </span>
+                        </div>
+                        ${!isCorrect ? `
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-1 bg-green-500/20 rounded text-green-400">CORRECT</span>
+                                <span class="text-green-400 font-bold">${q.options[q.correct]}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                reviewList.appendChild(div);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize Listeners
+        document.getElementById('start-btn').onclick = startQuiz;
+        nextBtn.onclick = handleNext;
+        prevBtn.onclick = handlePrev;
+        viewReviewBtn.onclick = showReview;
+
+    </script>
+</body>
+</html>
